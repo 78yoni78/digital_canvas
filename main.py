@@ -8,31 +8,43 @@ from model import DigitClassifier
 
 class Paint(object):
 
-    DEFAULT_PEN_SIZE = 50
-    PEN_SIZE_MIN = 10
-    PEN_SIZE_MAX = 100
+    PEN_SIZE = 30
     DEFAULT_COLOR = 'black'
+    LIGHT_COLOR = '#f0f1f5'
+    HUE_COLOR = '#ba131e'
+    HUE_LIGHT_COLOR = '#eb4334'
+    DARK_COLOR = '#0f1012'
 
     def __init__(self):
         self.model = DigitClassifier()       
         self.root = Tk()
+        self.root.configure(width=700, height=700, bg=self.DARK_COLOR)
+        self.root.resizable(False, False)
 
-        self.pen_button = Button(self.root, text='pen', command=self.use_pen)
+        button_options = {
+            'bg': self.HUE_COLOR,
+            'fg': self.LIGHT_COLOR,
+            'activebackground': self.HUE_LIGHT_COLOR,
+            'borderwidth': 0,
+        }
+
+        self.pen_button = Button(self.root, text='pen', command=self.use_pen, **button_options)
         self.pen_button.grid(row=0, column=1)
 
-        self.eraser_button = Button(self.root, text='eraser', command=self.use_eraser)
+        self.eraser_button = Button(self.root, text='eraser', command=self.use_eraser, **button_options)
         self.eraser_button.grid(row=0, column=2)
 
-        self.clear_button = Button(self.root, text='clear', command=self.clear)
+        self.clear_button = Button(self.root, text='clear', command=self.clear, **button_options)
         self.clear_button.grid(row=0, column=3)
 
-        self.choose_size_button = Scale(self.root, from_=self.PEN_SIZE_MIN, to=self.PEN_SIZE_MAX, orient=HORIZONTAL)
-        self.choose_size_button.grid(row=0, column=4)
-        
-        self.label = Label(self.root, text='', font=("Courier", 44))
+        self.label = Label(self.root, text='', font=("Courier bold", 44), bg=self.DARK_COLOR, fg=self.HUE_COLOR)
         self.label.grid(row=4, column=4)
 
-        self.c = Canvas(self.root, bg='white', width=600, height=600)
+        self.c = Canvas(self.root,
+                        bg=self.LIGHT_COLOR,
+                        width=600, height=600,
+                        borderwidth=1, relief='flat')
+        self.c.place(relx=.5, rely=.5,anchor= CENTER)
         self.c.grid(row=1, columnspan=5)
         
         self.image = PIL.Image.new('L', size=(600, 600))
@@ -44,13 +56,11 @@ class Paint(object):
     def setup(self):
         self.old_x = None
         self.old_y = None
-        self.line_width = self.choose_size_button.get()
         self.color = self.DEFAULT_COLOR
         self.eraser_on = False
         self.active_button = self.pen_button
         self.c.bind('<B1-Motion>', self.paint)
         self.c.bind('<ButtonRelease-1>', self.reset)
-        self.choose_size_button.set(self.DEFAULT_PEN_SIZE)
         self.draw.rectangle([0, 0, self.image.size[0], self.image.size[1]], fill='white')
         self.use_pen()
 
@@ -75,14 +85,13 @@ class Paint(object):
         self.eraser_on = eraser_mode
 
     def paint(self, event):
-        self.line_width = self.choose_size_button.get()
         paint_color = 'white' if self.eraser_on else self.color
         if self.old_x and self.old_y:
             self.c.create_line(self.old_x, self.old_y, event.x, event.y,
-                               width=self.line_width, fill=paint_color,
+                               width=self.PEN_SIZE, fill=paint_color,
                                capstyle=ROUND, smooth=TRUE, splinesteps=36)
             self.draw.line([self.old_x, self.old_y, event.x, event.y],
-                           width=self.line_width, fill=paint_color)
+                           width=self.PEN_SIZE, fill=paint_color)
         self.old_x = event.x
         self.old_y = event.y
         
