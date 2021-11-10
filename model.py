@@ -24,7 +24,7 @@ def _create_trained_model() -> k.Model:
     (x_train, y_train), (x_test, y_test) = dataset.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
 
-    model.fit(x_train, y_train, epochs=5)
+    model.fit(x_train, y_train, epochs=10)
     
     return model
 
